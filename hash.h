@@ -3,6 +3,11 @@
 #include "sha256.h"
 #include <stddef.h>
 #include <stdbool.h>
+#include "config.h"
+
+#if SUPPORT_SHA3
+#include <KeccakHash.h>
+#endif
 
 /*
  * This defines the hash interface used within HSS.
@@ -16,10 +21,15 @@
 enum {
     HASH_SHA256 = 1,    /* SHA256 */
     HASH_SHA256_24 = 2, /* SHA256 truncated to 24 bytes */
+    HASH_SHAKE = 3,     /* SHAKE-256, with 256 bit output */
+    HASH_SHAKE_24 = 4,  /* SKAKE=256, with 192 bit output */
 };
 
 union hash_context {
     SHA256_CTX sha256;
+#if SUPPORT_SHA3
+    Keccak_HashInstance shake;
+#endif
     /* Any other hash contexts would go here */
 };
 
@@ -40,11 +50,6 @@ void hss_hash_ctx(void *result, int hash_type, union hash_context *ctx,
  * chatty; however sometimes you really need it for debugging
  */
 extern bool hss_verbose;
-
-/*
- * This constant has migrated to common_defs.h
- */
-/* #define MAX_HASH   32 */  /* Length of the largest hash we support */
 
 unsigned hss_hash_length(int hash_type);
 unsigned hss_hash_blocksize(int hash_type);

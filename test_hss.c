@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stddef.h>
 #include "test_hss.h"
+#include "hss.h"
 
 /*
  * This is the list of tests we know about
@@ -31,6 +32,7 @@ static struct {
     { "reserve", test_reserve, "reservation test", false },
     { "thread", test_thread, "threading logic test", false,
         check_threading_on },
+    { "shake", test_shake, "test of the internal SHAKE XOF", false, check_shake },
     { "h25", test_h25, "H=25 test", true, check_h25 },
  /* Add more here */  
 };
@@ -120,4 +122,20 @@ int main( int argc, char **argv ) {
     }
 
     return run_tests( tests_to_run, force_tests, fast_flag, quiet_flag );
+}
+
+/*
+ * This checks to see if we believe that the library supports the SHA3-based
+ * parameter sets.  Sometimes, the library doesn't; this allows the tests
+ * to realize whether those parameter sets work
+ */
+extern bool test_if_sha3_is_supported(void) {
+    static const param_set_t lm_type = LMS_SHAKE_N32_H5;
+    static const param_set_t ots_type = LMOTS_SHAKE_N32_W4;
+
+    /* hss_get_signature_len is fast, and will reliably fail if */
+    /* the parameter set is not supported */
+    size_t size = hss_get_signature_len(1, &lm_type, &ots_type );
+
+    return size > 0;
 }

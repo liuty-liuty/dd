@@ -204,7 +204,11 @@ signed long initial_mem_target = mem_target; /* DEBUG HACK */
         if (i != 0) signature_len += pklen;
         if (w->siglen[i] == 0) {
             hss_free_working_key(w);
-            info->error_code = hss_error_bad_param_set;
+            if (lm_is_sha3_lm_type(lm_type[i])) {
+                info->error_code = hss_error_sha3_not_enabled;
+            } else {
+                info->error_code = hss_error_bad_param_set;
+            }
             return 0;
         }
             /* We don't need a allocate a signature for the topmost */
@@ -243,7 +247,11 @@ signed long initial_mem_target = mem_target; /* DEBUG HACK */
         if (!lm_look_up_parameter_set(lm_type[i], &level_hash[i],
                               &hash_size[i], &level_height[i])) {
             hss_free_working_key(w);
-            info->error_code = hss_error_bad_param_set;
+            if (lm_is_sha3_lm_type(lm_type[i])) {
+                info->error_code = hss_error_sha3_not_enabled;
+            } else {
+                info->error_code = hss_error_bad_param_set;
+            }
             return 0;
         }
 

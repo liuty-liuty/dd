@@ -86,9 +86,9 @@ static bool test_aux( param_set_t lm_setting, param_set_t ots_setting,
     return true;
 }
 
-#define NUM_PARM_SETS 11
+#define NUM_PARM_SETS 16
 
-static bool load_key( int *index, unsigned char priv_key[][48], 
+static bool load_key( int *index, unsigned char priv_key[][HSS_MAX_PRIVATE_KEY_LEN], 
               struct hss_working_key **w, int levels, ...) {
     int i;
     int n = *index;
@@ -135,6 +135,7 @@ failed:
 }
 
 bool test_load(bool fast_flag, bool quiet_flag) {
+    bool do_sha3 = test_if_sha3_is_supported();
 
     /*
      * Make sure that various sizes of aux data work consistently
@@ -145,8 +146,18 @@ bool test_load(bool fast_flag, bool quiet_flag) {
     if (!test_aux( LMS_SHA256_N24_H10, LMOTS_SHA256_N24_W2, 24)) return false;
     if (!test_aux( LMS_SHA256_N32_H15, LMOTS_SHA256_N32_W2, 32 )) return false;
     if (!test_aux( LMS_SHA256_N24_H15, LMOTS_SHA256_N24_W2, 24 )) return false;
+    if (do_sha3) {
+        if (!test_aux( LMS_SHAKE_N32_H5, LMOTS_SHAKE_N32_W2,  32 )) return false;
+        if (!test_aux( LMS_SHAKE_N24_H5, LMOTS_SHAKE_N24_W2,  24 )) return false;
+        if (!test_aux( LMS_SHAKE_N32_H10, LMOTS_SHAKE_N32_W2, 32)) return false;
+        if (!test_aux( LMS_SHAKE_N24_H10, LMOTS_SHAKE_N24_W2, 24)) return false;
+    }
     if (!fast_flag) {
-        if (!test_aux( LMS_SHA256_N32_H20, LMOTS_SHA256_N32_W2, 32 )) return false;
+        if (do_sha3) {
+            if (!test_aux( LMS_SHAKE_N32_H15, LMOTS_SHAKE_N32_W2, 32)) return false;
+            if (!test_aux( LMS_SHAKE_N24_H15, LMOTS_SHAKE_N24_W2, 24)) return false;
+            if (!test_aux( LMS_SHA256_N32_H20, LMOTS_SHA256_N32_W2, 32 )) return false;
+        }
         if (!test_aux( LMS_SHA256_N24_H20, LMOTS_SHA256_N24_W2, 24 )) return false;
     }
 
@@ -154,7 +165,7 @@ bool test_load(bool fast_flag, bool quiet_flag) {
      * Verify that we can't load a private key with the wrong parameter set
      * into an already allocated working set
      */
-    unsigned char priv_key[NUM_PARM_SETS][48];
+    unsigned char priv_key[NUM_PARM_SETS][HSS_MAX_PRIVATE_KEY_LEN];
     struct hss_working_key *w[NUM_PARM_SETS] = { 0 };
 
     int index = 0;
@@ -177,6 +188,26 @@ bool test_load(bool fast_flag, bool quiet_flag) {
     if (!load_key( &index, priv_key, w, 2,
                    (ul)LMS_SHA256_N24_H5, (ul)LMOTS_SHA256_N24_W2,
                    (ul)LMS_SHA256_N32_H5, (ul)LMOTS_SHA256_N32_W2)) return false;
+    if (do_sha3) {
+        if (!load_key( &index, priv_key, w, 1,
+                       (ul)LMS_SHAKE_N32_H5, (ul)LMOTS_SHAKE_N32_W2)) return false;
+        if (!load_key( &index, priv_key, w, 1,
+                       (ul)LMS_SHAKE_N32_H10, (ul)LMOTS_SHAKE_N32_W2)) return false;
+        if (!load_key( &index, priv_key, w, 1,
+                       (ul)LMS_SHAKE_N32_H5, (ul)LMOTS_SHAKE_N32_W4)) return false;
+        if (!load_key( &index, priv_key, w, 2,
+                       (ul)LMS_SHAKE_N32_H5, (ul)LMOTS_SHAKE_N32_W2,
+                       (ul)LMS_SHAKE_N32_H5, (ul)LMOTS_SHAKE_N32_W2)) return false;
+        if (!load_key( &index, priv_key, w, 1,
+                       (ul)LMS_SHAKE_N24_H5, (ul)LMOTS_SHAKE_N24_W2)) return false;
+        if (!load_key( &index, priv_key, w, 1,
+                       (ul)LMS_SHAKE_N24_H10, (ul)LMOTS_SHAKE_N24_W2)) return false;
+        if (!load_key( &index, priv_key, w, 1,
+                       (ul)LMS_SHAKE_N24_H10, (ul)LMOTS_SHAKE_N24_W4)) return false;
+        if (!load_key( &index, priv_key, w, 2,
+                       (ul)LMS_SHAKE_N24_H5, (ul)LMOTS_SHAKE_N24_W2,
+                       (ul)LMS_SHAKE_N32_H5, (ul)LMOTS_SHAKE_N32_W2)) return false;
+    }
 
     int i, j;
     bool retval = true;

@@ -10,6 +10,7 @@ size_t lm_get_signature_len(param_set_t lm_type,
 
 bool lm_look_up_parameter_set(param_set_t parameter_set,
      unsigned *h, unsigned *n, unsigned *height);
+bool lm_is_sha3_lm_type(param_set_t parameter_set);
 
 /* The format of an LM public key; it consists of: */
 #define LM_PUB_PARM_SET    0       /* The parameter set (4 bytes) */

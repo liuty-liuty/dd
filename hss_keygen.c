@@ -81,7 +81,11 @@ bool hss_generate_private_key(
     unsigned size_hash;  /* The size of each hash that would appear in the */
                   /* aux data */
     if (!lm_look_up_parameter_set(lm_type[0], &h, &size_hash, &h0)) {
-        info->error_code = hss_error_bad_param_set;
+        if (lm_is_sha3_lm_type(lm_type[0])) {
+            info->error_code = hss_error_sha3_not_enabled;
+        } else {
+            info->error_code = hss_error_bad_param_set;
+        }
         return false;
     }
 
@@ -103,7 +107,11 @@ bool hss_generate_private_key(
 
     unsigned len_ots_pub = lm_ots_get_public_key_len(lm_ots_type[0]);
     if (len_ots_pub == 0) {
-        info->error_code = hss_error_bad_param_set;
+        if (lm_ots_is_sha3_lmots_type(lm_ots_type[0])) {
+            info->error_code = hss_error_sha3_not_enabled;
+        } else {
+            info->error_code = hss_error_bad_param_set;
+        }
         return false;
     }
 
@@ -112,10 +120,12 @@ bool hss_generate_private_key(
         /* First step: format the private key */
     put_bigendian( private_key + PRIVATE_KEY_INDEX, 0,
                    PRIVATE_KEY_INDEX_LEN );
-    if (!hss_compress_param_set( private_key + PRIVATE_KEY_PARAM_SET,
+    enum hss_error_code e = hss_compress_param_set(
+                   private_key + PRIVATE_KEY_PARAM_SET,
                    levels, lm_type, lm_ots_type,
-                   PRIVATE_KEY_PARAM_SET_LEN )) {
-        info->error_code = hss_error_bad_param_set;
+                   PRIVATE_KEY_PARAM_SET_LEN );
+    if (e != hss_error_none) {
+        info->error_code = e;
         return false;
     }
     if (!(*generate_random)( private_key + PRIVATE_KEY_SEED,

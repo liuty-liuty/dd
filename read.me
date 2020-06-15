@@ -1,5 +1,5 @@
 This code attempts to be a usable implementation of of the LMS Hash Based
-Signature Scheme from RFC 8554.
+Signature Scheme from RFC 8554 (Leighton-Micali Hash-Based Signatures).
 
 This is a signature scheme (that is, someone with the private key can sign
 messages, someone with the public key can verify sigantures, but cannot
@@ -161,10 +161,10 @@ feature-centric order, rather than a problem-centric one:
   private key into three parts:
   - A short section which is meant to be saved in secure storage (and this is
     the part which is referred to as the 'private key'; this includes the
-    number of signatures generated so far.  It's currently 48 bytes long
+    number of signatures generated so far.  It's currently 56 bytes long
     (with the part that needs to be actually updated only 8 bytes), we assume
-    that it is updated atomically.  These 48 bytes consist of an 8 byte count
-    of the number of sigantures generated so far, 8 bytes of a compressed
+    that it is updated atomically.  These 56 bytes consist of an 8 byte count
+    of the number of sigantures generated so far, 16 bytes of a compressed
     version of the parameter set, and 32 bytes of 'seed' (a random value that
     is used to derive every secret)
   - A longer section (the "working key") that resides in memory; we assume
@@ -271,10 +271,18 @@ real applications really ought not do.
 
 General notes:
 
-- Advice about parameter sets: while this supports all the HSS parameter sets
-  currently allowed in draft-mcgrew-hash-sigs-08, some work better than others
-  The general recommendation is to use a few large trees (that is, with lots
-  of levels), rather than using a number of levels of smaller trees; this
+- The library does include config.h which contains some parameters which
+  are designed to be tweakable (as appropriate for the environment).  The
+  current parameters define how secret values are derived (probabily not
+  that important for most users), and whether the SHA-3 parameter sets are
+  supported.  The last is there because we use a separate Keccak library
+  for SHA-3 support, and I expect that most users will not need it (hence
+  I don't want to require it).
+
+- Advice about parameter sets: while this supports the HSS parameter sets
+  in both RFC 8554 and draft-fluhrer-lms-more-parm-sets, some work better than
+  others The general recommendation is to use a few large trees (that is, with
+  lots of levels), rather than using a number of levels of smaller trees; this
   package tries to make large trees not that costly (and reducing the number
   of trees certainly cuts down on the signature size).  If you have a
   reasonable amount of auxiliary data available (and ideally, multithreading),
@@ -395,6 +403,17 @@ General notes:
   or
       struct hss_extra_info info;
       hss_init_extra_info( &info );
+
+- This library supports the SHA-256 based parameter sets of RFC 8554 and
+  draft-fluhrer-lms-more-parm-sets; in addition, it can optionally also
+  support the SHAKE-based parameter sets (based on a setting in config.h)
+  Personally, the 192-bit SHA-256 parameter sets are nice (as it reduces
+  the signature size quite a bit).  On the other hand, I personally don't
+  see a great deal of benefit to the SHAKE-based parameter sets (unless
+  you don't trust the cryptographical strength of SHA-256).  On my machine
+  (with no special SHA-256 or SHAKE instructions), the SHAKE parameter sets
+  tested at over 4 times slower.
+
 
 Future ideas; I'm not against future ideas, but this package is getting
 sufficiently complex that I'm not likely to do anything that adds even more
@@ -595,3 +614,7 @@ likely not to implement it:
 - Right now, hss_extra_info has a last_signature flag.  Would it be more
   useful to have a 'signatures_remaining' count instead (and when it hits
   0, that'd mean we just wrote the last signature)?
+
+- For SHAKE support, we make calls into the Keccak library (as my rather
+  old copy of OpenSSL doesn't have SHA-3 support).  We probably should add
+  an option for making OpenSSL shake calls. 

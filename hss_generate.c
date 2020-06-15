@@ -302,11 +302,11 @@ bool hss_generate_working_key(
             lm_ots_type[i] = w->tree[i]->lm_ots_type;
         }
             
-        if (!hss_compress_param_set( compressed, w->levels,
-                      lm_type, lm_ots_type,
-                      sizeof compressed )) {
+        enum hss_error_code e = hss_compress_param_set( compressed, w->levels,
+                      lm_type, lm_ots_type, sizeof compressed );
+        if (e != hss_error_none) {
                /* We're passed an unsupported param set */
-            info->error_code = hss_error_internal;
+            info->error_code = e;
             goto failed;
         }
         if (0 != memcmp( private_key + PRIVATE_KEY_PARAM_SET, compressed,

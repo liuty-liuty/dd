@@ -12,5 +12,6 @@ unsigned lm_ots_hashes_per_public_key(param_set_t lm_ots_type);
 unsigned lm_ots_compute_checksum(const unsigned char *Q, unsigned Q_len,
                                  unsigned w, unsigned ls);
 unsigned lm_ots_coef(const unsigned char *Q, unsigned i, unsigned w);
+bool lm_ots_is_sha3_lmots_type(param_set_t parameter_set);
 
 #endif /* LM_OTS_COMMON_H_ */

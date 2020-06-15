@@ -500,6 +500,15 @@ sources.
   We also use floating point in the regression code; to figure out when to
   update the displayed % completed.
 
+- SHA3 support
+  We have integrated the SHA3-based parameter sets.  The biggest change this
+  required was in the internal format of the private key.  We used to encode
+  both the LM and the OTS settings for a single level into one byte.  However,
+  there are now a total of more than 256 possibilities (since we allow all
+  legal combinations, including a LM-OTS SHA-2 parameter and an LM SHAKE
+  parameter set), and so we expanded the parameter set area within the prviate
+  key to be 16 bytes (2 bytes per level).
+
 - Debugging
   Good luck...
 
@@ -540,6 +549,15 @@ sources.
   Testing those would require more infrastructure than we have right now.
   Also, it might not be that bad of an idea to run a code-coverage tool to
   check out how much of the code the regression tests actually tests.
+
+  In addition, the regression tests include a quick test to see if SHAKE
+  is supported (as support for it is optional); if that quick test says
+  that it is not, then testing all SHAKE parameter sets is skipped (other
+  than the generic test that try various parameter sets to see if they
+  work or fail as expected - in that case, those SHAKE parameter sets
+  are expected to fail.  You can see the result of this quick test in
+  the ""test of the internal SHAKE XOF" test - if that quick test fails,
+  then the test will be explicitly skipped.
 
 - Files; this is a listing of the files that make up this subsystem, and a
   brief description of what's in them.  Note that for many .c files, we have a

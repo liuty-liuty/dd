@@ -297,7 +297,7 @@ bool hss_set_autoreserve(
 size_t hss_get_private_key_len(unsigned levels,
                    const param_set_t *lm_type,
                    const param_set_t *lm_ots_type);
-#define HSS_MAX_PRIVATE_KEY_LEN (8 + 8 + MAX_SEED_LEN + 16)
+#define HSS_MAX_PRIVATE_KEY_LEN (8 + 16 + MAX_SEED_LEN + 16)
 
 /*
  * This include file has the functions that contains the lengths of the other
@@ -364,7 +364,10 @@ enum hss_error_code {
     hss_error_no_randomness, /* No RNG supplied */
     hss_error_bad_param_set, /* Application asked for an illegal parmaeter */
                              /* set */
-    hss_error_buffer_overflow, /* Buffer provide not big enough */
+    hss_error_sha3_not_enabled, /* Application asked for a SHA-3 based */
+                             /* parameter set; support for SHA-3 not */
+                             /* enabled */
+    hss_error_buffer_overflow, /* Buffer provided not big enough */
     hss_error_got_null,      /* Application passed in a NULL pointer */
     hss_error_bad_aux,       /* Error with provided aux buffer */
     hss_error_no_private_buffer, /* Application didn't provide a place */

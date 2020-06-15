@@ -10,31 +10,46 @@
 static param_set_t h_array[] = { 
     LMS_SHA256_N24_H5,
     LMS_SHA256_N32_H5,
+    LMS_SHAKE_N32_H5,
     LMS_SHA256_N24_H10,
         /* We don't test out the higher heights, because that'd take too */
         /* long, and wouldn't tell us that much for this test */
 };
 #define MAX_H_INDEX (sizeof h_array / sizeof *h_array )
 
-static param_set_t w_array[] = { 
-    LMOTS_SHA256_N32_W1,
-    LMOTS_SHA256_N24_W1,
-    LMOTS_SHA256_N32_W2,
-    LMOTS_SHA256_N24_W2,
-    LMOTS_SHA256_N32_W4,
-    LMOTS_SHA256_N24_W4,
-    LMOTS_SHA256_N32_W8,
-    LMOTS_SHA256_N24_W8,
+static struct {
+    param_set_t p;
+    enum { w8=1, sha3=2 } flag;
+} w_array[] = { 
+    { LMOTS_SHA256_N32_W1 },
+    { LMOTS_SHA256_N24_W1 },
+    { LMOTS_SHA256_N32_W2 },
+    { LMOTS_SHA256_N24_W2 },
+    { LMOTS_SHA256_N24_W4, w8 },
+    { LMOTS_SHA256_N24_W8, w8 },
+    { LMOTS_SHAKE_N24_W1, sha3 },
+    { LMOTS_SHAKE_N32_W2, sha3 },
+    { LMOTS_SHAKE_N24_W2, w8|sha3 },
+    { LMOTS_SHAKE_N24_W4, w8|sha3 },
 };
 #define MAX_W_INDEX (sizeof w_array / sizeof *w_array )
 /* This is (roughly) the number of hash compression operatios needed to */
-/* compute various OTS verifications.  Really off by a factor of two; */
+/* compute various OTS verifications.  This is off by a factor of two; */
 /* however that factor of two is consistent */
-int cost_per_sig[4] = {
+/* We model that the SHAKE operations is roughly twice expensive as the */
+/* SHA256 operations */
+int cost_per_sig[MAX_W_INDEX] = {
     (1<<1) * 265,
+    (1<<1) * 200,
     (1<<2) * 133,
-    (1<<4) * 133,
-    (1<<8) * 34,
+    (1<<2) * 101,
+    (1<<4) * 51,
+    (1<<8) * 26,
+
+    (2<<1) * 200,     /* SHAKE_N24_W1 */
+    (2<<2) * 133,     /* SHAKE_N32_W2 */
+    (2<<2) * 101,     /* SHAKE_N24_W2 */
+    (2<<4) * 51,      /* SHAKE_N24_W4 */
 };
 
 static bool do_verify( unsigned char *private_key, unsigned char *public_key,
@@ -60,25 +75,35 @@ bool test_verify(bool fast_flag, bool quiet_flag) {
     } work_array[ 8 * MAX_H_INDEX * MAX_W_INDEX ];
     int w_count = 0;
     float total_cost = 0;
+    bool do_sha3 = test_if_sha3_is_supported();
 
     /* Fill in the jobs we expect to do */
     int max_d = 0;
     for (d = 1; d <= 8; d++) {
-        if (fast_flag && d > 3) continue;
+        if (fast_flag && d > 2) continue;
 
         int h_index, w_index;
         for (h_index=0; h_index < MAX_H_INDEX; h_index++) {
         for (w_index=0; w_index < MAX_W_INDEX; w_index++) {
             param_set_t h = h_array[h_index];
-            param_set_t w = w_array[w_index];
-               /* Flag is set if we're testing out a W=8 parameter set */
-            int w8 = (w == LMOTS_SHA256_N32_W8 || w == LMOTS_SHA256_N24_W8);
+            param_set_t w = w_array[w_index].p;
+
+                /* Skip SHA3 parameter sets if they're not supported */
+            if (!do_sha3) {
+                 if (w_array[w_index].flag & sha3) continue;
+                 if (h == LMS_SHAKE_N24_H5 || h == LMS_SHAKE_N32_H5) continue;
+            }
+
+               /* Flag is set if we're testing out a slower parameter set */
+            int slow_param = (w_array[w_index].flag & w8);
 
                 /* Note: this particular combination takes longer than the */
                 /* rest combined; it wouldn't tell us much more, so skip it */
-            if (h == LMS_SHA256_N24_H10 && w8) continue;
-                /* In fast mode, we both testing out W=8 only for d=1 */ 
-            if (fast_flag && d > 1 && w8) continue;
+            if (h == LMS_SHA256_N24_H10 && slow_param) continue;
+                /* In fast mode, we skip testing the slow parameter sets entirely */ 
+            if (fast_flag && slow_param) continue;
+                /* We also skip the more expensive LMS SHAKE parmset in fast */
+            if (fast_flag && h == LMS_SHAKE_N32_H5) continue;
 
             work_array[w_count].d = max_d = d;
             work_array[w_count].h = h;
@@ -97,7 +122,7 @@ bool test_verify(bool fast_flag, bool quiet_flag) {
     }
 
     float cost_so_far = 0;
-    int displayed_percent = 0;
+    int displayed_percent = -1;
     for (i=0; i<w_count; i++) {
         if (!quiet_flag) {
             int new_percent = (int)(100 * cost_so_far / total_cost);

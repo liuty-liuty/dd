@@ -31,4 +31,13 @@
  */
 #define SECRET_MAX 4  /* Never use a seed more than 16 times */
 
+/*
+ * This indicates whether we attempt to support the SHA3 (SHAKE) based
+ * parameter sets
+ *
+ * 0 -> We don't
+ * 1 -> We do.  This requires us to use a SHA3 library
+ */
+#define SUPPORT_SHA3 0
+
 #endif /* CONFIG_H_ */

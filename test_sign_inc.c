@@ -310,6 +310,7 @@ static bool run_test_2(int d, param_set_t *lm_array, param_set_t *lm_ots_array,
 }
 
 bool test_sign_inc(bool fast_flag, bool quiet_flag) {
+    bool do_sha3 = test_if_sha3_is_supported();
 
     /*
      * First set of tests; for several different parameter sets, create the
@@ -327,6 +328,12 @@ bool test_sign_inc(bool fast_flag, bool quiet_flag) {
         int d = 1;
         param_set_t lm_array[1] = { LMS_SHA256_N24_H5 };
         param_set_t lm_ots_array[1] = { LMOTS_SHA256_N24_W8 };
+        if (!run_test( d, lm_array, lm_ots_array, 32, true )) return false;
+    }
+    if (do_sha3) {
+        int d = 1;
+        param_set_t lm_array[1] = { LMS_SHAKE_N24_H5 };
+        param_set_t lm_ots_array[1] = { LMOTS_SHAKE_N24_W4 };
         if (!run_test( d, lm_array, lm_ots_array, 32, true )) return false;
     }
     {
@@ -351,6 +358,12 @@ bool test_sign_inc(bool fast_flag, bool quiet_flag) {
         int d = 1;
         param_set_t lm_array[1] = { LMS_SHA256_N24_H10 };
         param_set_t lm_ots_array[1] = { LMOTS_SHA256_N24_W4 };
+        if (!run_test( d, lm_array, lm_ots_array, 1024, true )) return false;
+    }
+    if (do_sha3) {
+        int d = 1;
+        param_set_t lm_array[1] = { LMS_SHAKE_N24_H10 };
+        param_set_t lm_ots_array[1] = { LMOTS_SHAKE_N24_W2 };
         if (!run_test( d, lm_array, lm_ots_array, 1024, true )) return false;
     }
     {
@@ -381,6 +394,12 @@ bool test_sign_inc(bool fast_flag, bool quiet_flag) {
         int d = 2;
         param_set_t lm_array[2] = { LMS_SHA256_N24_H5, LMS_SHA256_N24_H5 };
         param_set_t lm_ots_array[2] = { LMOTS_SHA256_N32_W4, LMOTS_SHA256_N24_W2 };
+        if (!run_test( d, lm_array, lm_ots_array, 1024, true )) return false;
+    }
+    if (do_sha3) {
+        int d = 2;
+        param_set_t lm_array[2] = { LMS_SHAKE_N24_H5, LMS_SHAKE_N24_H5 };
+        param_set_t lm_ots_array[2] = { LMOTS_SHAKE_N32_W4, LMOTS_SHAKE_N24_W2 };
         if (!run_test( d, lm_array, lm_ots_array, 1024, true )) return false;
     }
     {

@@ -11,7 +11,7 @@
  * this subsystem.  It should not be used by applications
  */
 
-#define PARAM_SET_COMPRESS_LEN 1  /* We assume that we can compress the */
+#define PARAM_SET_COMPRESS_LEN 2  /* We assume that we can compress the */
                                   /* lm_type and the lm_ots type for a */
                                   /* single level into 1 byte */
 
@@ -42,7 +42,7 @@
 #define PRIVATE_KEY_SEED_LEN(seed_len) SEED_LEN
 #endif
 #define PRIVATE_KEY_LEN(seed_len) (PRIVATE_KEY_SEED + \
-                    PRIVATE_KEY_SEED_LEN(seed_len)) /* That's 48-64 bytes */
+                    PRIVATE_KEY_SEED_LEN(seed_len)) /* That's 56-72 bytes */
 
 struct merkle_level;
 struct hss_working_key {
@@ -175,7 +175,7 @@ struct subtree {
 
 /* Internal function to compress a list of parameters into a short format */
 /* that we use internally */
-bool hss_compress_param_set( unsigned char *compressed,
+enum hss_error_code hss_compress_param_set( unsigned char *compressed,
                    int levels, 
                    const param_set_t *lm_type,
                    const param_set_t *lm_ots_type,

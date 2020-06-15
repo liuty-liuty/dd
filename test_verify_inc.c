@@ -231,6 +231,17 @@ bool test_verify_inc(bool fast_flag, bool quiet_flag) {
             return false;
     }
 
+    if (test_if_sha3_is_supported()) {
+        static param_set_t lm_array[MAX_D] = {
+                                    LMS_SHAKE_N24_H10, LMS_SHAKE_N24_H5,
+                                    LMS_SHAKE_N24_H5, LMS_SHAKE_N24_H5 };
+        static param_set_t lm_ots_array[MAX_D] = {
+                  LMOTS_SHAKE_N24_W4, LMOTS_SHAKE_N24_W4,
+                  LMOTS_SHAKE_N24_W4, LMOTS_SHAKE_N24_W4 };
+        if (!do_test( fast_flag, max_d, lm_array, lm_ots_array))
+            return false;
+    }
+
     if (!fast_flag) {
         static param_set_t lm_array[MAX_D] = {
                                     LMS_SHA256_N32_H10, LMS_SHA256_N32_H5,

@@ -9,6 +9,7 @@
 #include "hash.h"
 #include "hss_thread.h"
 #include "lm_ots_common.h"
+#include "lm_common.h"
 #include "lm_ots.h"
 #include "endian.h"
 #include "hss_derive.h"
@@ -59,7 +60,11 @@ static enum hss_error_code hss_compute_internal_node( unsigned char *dest,
     struct seed_derive derive;
     if (!hss_seed_derive_init( &derive, lm_type, lm_ots_type,
                                I, seed, hss_seed_size(lm_type))) {
-        return hss_error_bad_param_set;
+        if (lm_is_sha3_lm_type(lm_type)) {
+            return hss_error_sha3_not_enabled;
+        } else {
+            return hss_error_bad_param_set;
+        }
     }
 
     for (i=0;; i++, r++, q++) {
@@ -67,8 +72,12 @@ static enum hss_error_code hss_compute_internal_node( unsigned char *dest,
         hss_seed_derive_set_q( &derive, q );
         if (!lm_ots_generate_public_key(lm_ots_type, I,
                    q, &derive, pub_key + LEAF_PK, ots_len)) {
-            return hss_error_bad_param_set; /* The only reason the above */
-                                            /* could fail */
+            /* The only two reasons the above could fail */
+            if (lm_ots_is_sha3_lmots_type(lm_type)) {
+                return hss_error_sha3_not_enabled;
+            } else {
+                return hss_error_bad_param_set;
+            }
         }
 
         /*

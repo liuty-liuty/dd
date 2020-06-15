@@ -38,6 +38,6 @@
  * 0 -> We don't
  * 1 -> We do.  This requires us to use a SHA3 library
  */
-#define SUPPORT_SHA3 0
+#define SUPPORT_SHA3 1
 
 #endif /* CONFIG_H_ */

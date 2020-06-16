@@ -167,15 +167,17 @@ sources.
   this subsystem, and what they really mean
   private key
       This is what the raw private key looks like.  It's not a formal C
-      structure; instead, it is a byte array, currently 48 bytes long,
+      structure; instead, it is a byte array, currently 56 bytes long,
       split up into:
       - 8 bytes of count; this is the state that gets updated with every
         signature, and consists of a bigendian count of the number of
         signatures so far.  By convention, a setting of 0xffffffffffffffff
         means 'we're used up all our signatures'
-      - 8 bytes of parameter set, in a compressed format.  This is here so
-        that the application needn't tell us what the parmaeter set when
-        loading a key (and can't get it wrong)
+      - 16 bytes of parameter set, in a compressed format; we have 8
+        slots, corresponding to the 8 potential levels of the tree (if we
+        don't use all 8 levels, we fill the remaining ones with an 0xffff
+        filler).  This is here so that the application needn't tell us what
+        the parmaeter set when loading a key (and can't get it wrong)
       - 32 bytes of random seed; this is where all the security comes from.
         It is 32 bytes (256 bits) so Grover's algorthm can't recover it.
       This is a flat set of bytes, because we hand it to read_private_key

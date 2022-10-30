@@ -24,20 +24,31 @@ bool hss_compress_param_set( unsigned char *compressed,
             /* Review this format if we need to support larger ones */
         if (a > 0x0e || b > 0x0e) return false;
             /* Make sure the parm sets are supported */
-        switch (a) {
+        switch (a) {/*
         case LMS_SHA256_N32_H5: case LMS_SHA256_N32_H10:
         case LMS_SHA256_N32_H15: case LMS_SHA256_N32_H20:
         case LMS_SHA256_N32_H25:
+*/
+        case LMS_SM3_N32_H5: case LMS_SM3_N32_H10:
+        case LMS_SM3_N32_H15: case LMS_SM3_N32_H20:
+        case LMS_SM3_N32_H25:
             break;
         default:
             return false;
         }
-        switch (b) {
+        switch (b) {/*
         case LMOTS_SHA256_N32_W1: case LMOTS_SHA256_N32_W2:
         case LMOTS_SHA256_N32_W4: case LMOTS_SHA256_N32_W8:
             break;
         default:
             return false;
+*/        
+        case LMOTS_SM3_N32_W1: case LMOTS_SM3_N32_W2:
+        case LMOTS_SM3_N32_W4: case LMOTS_SM3_N32_W8:
+            break;
+        default:
+            return false;
+        
         }
         
         *compressed++ = (a<<4) + b;
@@ -97,19 +108,31 @@ bool hss_get_parameter_set( unsigned *levels,
         param_set_t ots = (c & 0x0f);
             /* Make sure both are supported */
             /* While we're here, add up the total Merkle height */
-        switch (lm) {
+        switch (lm) {/*
         case LMS_SHA256_N32_H5:  total_height += 5; break;
         case LMS_SHA256_N32_H10: total_height += 10; break;
         case LMS_SHA256_N32_H15: total_height += 15; break;
         case LMS_SHA256_N32_H20: total_height += 20; break;
         case LMS_SHA256_N32_H25: total_height += 25; break;
+*/
+        case LMS_SM3_N32_H5:  total_height += 5; break;
+        case LMS_SM3_N32_H10: total_height += 10; break;
+        case LMS_SM3_N32_H15: total_height += 15; break;
+        case LMS_SM3_N32_H20: total_height += 20; break;
+        case LMS_SM3_N32_H25: total_height += 25; break;
         default: goto failed;
         }
-        switch (ots) {
+        switch (ots) {/*
         case LMOTS_SHA256_N32_W1:
         case LMOTS_SHA256_N32_W2:
         case LMOTS_SHA256_N32_W4:
         case LMOTS_SHA256_N32_W8:
+*/
+
+        case LMOTS_SM3_N32_W1:
+        case LMOTS_SM3_N32_W2:
+        case LMOTS_SM3_N32_W4:
+        case LMOTS_SM3_N32_W8:
             break;
         default: goto failed;
         }

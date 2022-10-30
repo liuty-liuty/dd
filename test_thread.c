@@ -168,23 +168,31 @@ failed:
 
 bool test_thread(bool fast_flag, bool quiet_flag) {
     {
-        param_set_t lm[1] = { LMS_SHA256_N32_H5 };
-        param_set_t ots[1] = { LMOTS_SHA256_N32_W8 };
+        //param_set_t lm[1] = { LMS_SHA256_N32_H5 };
+        //param_set_t ots[1] = { LMOTS_SHA256_N32_W8 };
+        param_set_t lm[1] = { LMS_SM3_N32_H5 };
+        param_set_t ots[1] = { LMOTS_SM3_N32_W8 };
         if (!run_test(1, lm, ots)) return false;
     }
     {
-        param_set_t lm[1] = { LMS_SHA256_N32_H10 };
-        param_set_t ots[1] = { LMOTS_SHA256_N32_W4 };
+        //param_set_t lm[1] = { LMS_SHA256_N32_H10 };
+        //param_set_t ots[1] = { LMOTS_SHA256_N32_W4 };
+        param_set_t lm[1] = { LMS_SM3_N32_H10 };
+        param_set_t ots[1] = { LMOTS_SM3_N32_W4 };
         if (!run_test(1, lm, ots)) return false;
     }
     {
-        param_set_t lm[2] = { LMS_SHA256_N32_H10, LMS_SHA256_N32_H5 };
-        param_set_t ots[2] = { LMOTS_SHA256_N32_W2, LMOTS_SHA256_N32_W4 };
+        //param_set_t lm[2] = { LMS_SHA256_N32_H10, LMS_SHA256_N32_H5 };
+        //param_set_t ots[2] = { LMOTS_SHA256_N32_W2, LMOTS_SHA256_N32_W4 };
+        param_set_t lm[2] = { LMS_SM3_N32_H10, LMS_SM3_N32_H5 };
+        param_set_t ots[2] = { LMOTS_SM3_N32_W2, LMOTS_SM3_N32_W4 };
         if (!run_test(2, lm, ots)) return false;
     }
     if (!fast_flag) { /* This test exceeds our 15 second fast threshold */
-        param_set_t lm[2] = { LMS_SHA256_N32_H15, LMS_SHA256_N32_H15 };
-        param_set_t ots[2] = { LMOTS_SHA256_N32_W2, LMOTS_SHA256_N32_W2 };
+        //param_set_t lm[2] = { LMS_SHA256_N32_H15, LMS_SHA256_N32_H15 };
+        //param_set_t ots[2] = { LMOTS_SHA256_N32_W2, LMOTS_SHA256_N32_W2 };
+        param_set_t lm[2] = { LMS_SM3_N32_H15, LMS_SM3_N32_H15 };
+        param_set_t ots[2] = { LMOTS_SM3_N32_W2, LMOTS_SM3_N32_W2 };
         if (!run_test(2, lm, ots)) return false;
     }
 /* MORE HERE */

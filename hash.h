@@ -1,6 +1,7 @@
 #if !defined( HASH_H__ )
 #define HASH_H__
 #include "sha256.h"
+#include "sm3.h"
 #include <stddef.h>
 #include <stdbool.h>
 
@@ -15,10 +16,12 @@
  */
 enum {
     HASH_SHA256 = 1,    /* SHA256 */
+    HASH_SM3 ,    /* SM3 */
 };
 
 union hash_context {
     SHA256_CTX sha256;
+    SM3_CTX sm3;
     /* Any other hash contexts would go here */
 };
 

@@ -33,11 +33,16 @@ static unsigned long get_int(const unsigned char *p) {
 
 static int lookup_h(unsigned long val) {
     switch (val) {
-    case LMS_SHA256_N32_H5:  return 5;
-    case LMS_SHA256_N32_H10: return 10;
-    case LMS_SHA256_N32_H15: return 15;
-    case LMS_SHA256_N32_H20: return 20;
-    case LMS_SHA256_N32_H25: return 25;
+    //case LMS_SHA256_N32_H5:  return 5;
+    //case LMS_SHA256_N32_H10: return 10;
+    //case LMS_SHA256_N32_H15: return 15;
+    //case LMS_SHA256_N32_H20: return 20;
+    //case LMS_SHA256_N32_H25: return 25;
+    case LMS_SM3_N32_H5:  return 5;
+    case LMS_SM3_N32_H10: return 10;
+    case LMS_SM3_N32_H15: return 15;
+    case LMS_SM3_N32_H20: return 20;
+    case LMS_SM3_N32_H25: return 25;
     default: return 0;
     }
 }
@@ -47,22 +52,36 @@ static bool test_parm( int d, long num_sig, ... );
 bool test_sign(bool fast_flag, bool quiet_flag) {
 
     /* Test out various parameter sets */
-    if (!test_parm( 1, 32, LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W1 )) return false;
-    if (!test_parm( 1, 32, LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W2 )) return false;
-    if (!test_parm( 1, 32, LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W4 )) return false;
-    if (!test_parm( 1, 32, LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W8 )) return false;
-    if (!test_parm( 1, 1024, LMS_SHA256_N32_H10, LMOTS_SHA256_N32_W2 )) return false;
-    if (!test_parm( 2, 1024, LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W4,
-                             LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W2 )) return false;
-    if (!test_parm( 1, 32768, LMS_SHA256_N32_H15, LMOTS_SHA256_N32_W2 )) return false;
-    if (!test_parm( 2, 32768, LMS_SHA256_N32_H10, LMOTS_SHA256_N32_W4,
-                             LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W2 )) return false;
-    if (!test_parm( 2, 32768, LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W4,
-                             LMS_SHA256_N32_H10, LMOTS_SHA256_N32_W2 )) return false;
-    if (!test_parm( 3, 32768, LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W4,
-                             LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W4,
-                             LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W2 )) return false;
-
+    //if (!test_parm( 1, 32, LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W1 )) return false;
+    //if (!test_parm( 1, 32, LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W2 )) return false;
+    //if (!test_parm( 1, 32, LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W4 )) return false;
+    //if (!test_parm( 1, 32, LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W8 )) return false;
+    //if (!test_parm( 1, 1024, LMS_SHA256_N32_H10, LMOTS_SHA256_N32_W2 )) return false;
+    //if (!test_parm( 2, 1024, LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W4,
+    //                         LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W2 )) return false;
+    //if (!test_parm( 1, 32768, LMS_SHA256_N32_H15, LMOTS_SHA256_N32_W2 )) return false;
+    //if (!test_parm( 2, 32768, LMS_SHA256_N32_H10, LMOTS_SHA256_N32_W4,
+    //                         LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W2 )) return false;
+    //if (!test_parm( 2, 32768, LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W4,
+    //                         LMS_SHA256_N32_H10, LMOTS_SHA256_N32_W2 )) return false;
+    //if (!test_parm( 3, 32768, LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W4,
+    //                         LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W4,
+    //                         LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W2 )) return false;
+    if (!test_parm( 1, 32, LMS_SM3_N32_H5, LMOTS_SM3_N32_W1 )) return false;
+    if (!test_parm( 1, 32, LMS_SM3_N32_H5, LMOTS_SM3_N32_W2 )) return false;
+    if (!test_parm( 1, 32, LMS_SM3_N32_H5, LMOTS_SM3_N32_W4 )) return false;
+    if (!test_parm( 1, 32, LMS_SM3_N32_H5, LMOTS_SM3_N32_W8 )) return false;
+    if (!test_parm( 1, 1024, LMS_SM3_N32_H10, LMOTS_SM3_N32_W2 )) return false;
+    if (!test_parm( 2, 1024, LMS_SM3_N32_H5, LMOTS_SM3_N32_W4,
+                             LMS_SM3_N32_H5, LMOTS_SM3_N32_W2 )) return false;
+    if (!test_parm( 1, 32768, LMS_SM3_N32_H15, LMOTS_SM3_N32_W2 )) return false;
+    if (!test_parm( 2, 32768, LMS_SM3_N32_H10, LMOTS_SM3_N32_W4,
+                             LMS_SM3_N32_H5, LMOTS_SM3_N32_W2 )) return false;
+    if (!test_parm( 2, 32768, LMS_SM3_N32_H5, LMOTS_SM3_N32_W4,
+                             LMS_SM3_N32_H10, LMOTS_SM3_N32_W2 )) return false;
+    if (!test_parm( 3, 32768, LMS_SM3_N32_H5, LMOTS_SM3_N32_W4,
+                             LMS_SM3_N32_H5, LMOTS_SM3_N32_W4,
+                             LMS_SM3_N32_H5, LMOTS_SM3_N32_W2 )) return false;
     return true;
 }
 
@@ -219,10 +238,14 @@ static bool test_parm( int d, long num_sig, ... ) {
             get_next(val); if (val != ots_type[level]) goto failed;
             /* Skip the appropriate number of hashes */
             switch (val) {
-            case LMOTS_SHA256_N32_W1: offset += 32 + 32*265; break;
-            case LMOTS_SHA256_N32_W2: offset += 32 + 32*133; break;
-            case LMOTS_SHA256_N32_W4: offset += 32 + 32*67; break;
-            case LMOTS_SHA256_N32_W8: offset += 32 + 32*34; break;
+            //case LMOTS_SHA256_N32_W1: offset += 32 + 32*265; break;
+            //case LMOTS_SHA256_N32_W2: offset += 32 + 32*133; break;
+            //case LMOTS_SHA256_N32_W4: offset += 32 + 32*67; break;
+            //case LMOTS_SHA256_N32_W8: offset += 32 + 32*34; break;
+            case LMOTS_SM3_N32_W1: offset += 32 + 32*265; break;
+            case LMOTS_SM3_N32_W2: offset += 32 + 32*133; break;
+            case LMOTS_SM3_N32_W4: offset += 32 + 32*67; break;
+            case LMOTS_SM3_N32_W8: offset += 32 + 32*34; break;
             default: goto failed;
             }
             /* Get the LM type */

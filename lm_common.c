@@ -14,7 +14,7 @@
 bool lm_look_up_parameter_set(param_set_t parameter_set,
      unsigned *h, unsigned *n, unsigned *height) {
     unsigned v_h, v_n, v_height;
-    switch (parameter_set) {
+    switch (parameter_set) {/*
     case LMS_SHA256_N32_H5:
         v_h = HASH_SHA256; v_n = 32; v_height = 5; break;
     case LMS_SHA256_N32_H10:
@@ -25,6 +25,18 @@ bool lm_look_up_parameter_set(param_set_t parameter_set,
         v_h = HASH_SHA256; v_n = 32; v_height = 20; break;
     case LMS_SHA256_N32_H25:
         v_h = HASH_SHA256; v_n = 32; v_height = 25; break;
+*/
+    case LMS_SM3_N32_H5:
+        v_h = HASH_SM3; v_n = 32; v_height = 5; break;
+    case LMS_SM3_N32_H10:
+        v_h = HASH_SM3; v_n = 32; v_height = 10; break;
+    case LMS_SM3_N32_H15:
+        v_h = HASH_SM3; v_n = 32; v_height = 15; break;
+    case LMS_SM3_N32_H20:
+        v_h = HASH_SM3; v_n = 32; v_height = 20; break;
+    case LMS_SM3_N32_H25:
+        v_h = HASH_SM3; v_n = 32; v_height = 25; break;
+
     default: return false;
     }
 

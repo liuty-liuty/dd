@@ -58,8 +58,10 @@ static bool gen_signature( unsigned char *privkey,
 
 bool test_keygen(bool fast_flag, bool quiet_flag) {
         /* We'll use this parameter set, unless we need to test out a different one */
-    param_set_t default_lm_type[2] = { LMS_SHA256_N32_H10, LMS_SHA256_N32_H15 };
-    param_set_t default_ots_type[2] = { LMOTS_SHA256_N32_W2, LMOTS_SHA256_N32_W8 };
+    //param_set_t default_lm_type[2] = { LMS_SHA256_N32_H10, LMS_SHA256_N32_H15 };
+    //param_set_t default_ots_type[2] = { LMOTS_SHA256_N32_W2, LMOTS_SHA256_N32_W8 };
+    param_set_t default_lm_type[2] = { LMS_SM3_N32_H10, LMS_SM3_N32_H15 };
+    param_set_t default_ots_type[2] = { LMOTS_SM3_N32_W2, LMOTS_SM3_N32_W8 };
     int default_d = 2;
     int default_pubkey_size = hss_get_public_key_len( default_d, default_lm_type, default_ots_type );
     int default_privkey_size = hss_get_private_key_len( default_d, default_lm_type, default_ots_type );
@@ -159,8 +161,10 @@ bool test_keygen(bool fast_flag, bool quiet_flag) {
     {
         param_set_t lm_type[12], ots_type[12];
         int i;
-        for (i=0; i<12; i++) lm_type[i] = LMS_SHA256_N32_H5;
-        for (i=0; i<12; i++) ots_type[i] = LMOTS_SHA256_N32_W8;
+        //for (i=0; i<12; i++) lm_type[i] = LMS_SHA256_N32_H5;
+        //for (i=0; i<12; i++) ots_type[i] = LMOTS_SHA256_N32_W8;
+        for (i=0; i<12; i++) lm_type[i] = LMS_SM3_N32_H5;
+        for (i=0; i<12; i++) ots_type[i] = LMOTS_SM3_N32_W8;
             /* Since some of these parm sets are illegal (and so don't */
             /* have a size we can look up), we oversize the buffer */
 
@@ -190,7 +194,8 @@ bool test_keygen(bool fast_flag, bool quiet_flag) {
         }
 
         d = 3;
-        ots_type[0] = LMOTS_SHA256_N32_W2; /* Make the keygen tests faster */
+        //ots_type[0] = LMOTS_SHA256_N32_W2; /* Make the keygen tests faster */
+        ots_type[0] = LMOTS_SM3_N32_W2; /* Make the keygen tests faster */
         /* Try various lm_types (both legal and illegal) */
         for (i=0; i<3; i++) {
             int lm;
@@ -198,23 +203,40 @@ bool test_keygen(bool fast_flag, bool quiet_flag) {
                       /* quick, so it's not that expensive to test a lot */
                 bool expect_success;
                 switch (lm) {
-                case LMS_SHA256_N32_H5:
-                case LMS_SHA256_N32_H10:
-                case LMS_SHA256_N32_H15:
+                //case LMS_SHA256_N32_H5:
+                //case LMS_SHA256_N32_H10:
+                //case LMS_SHA256_N32_H15:
+                //    expect_success = true; break;
+                //case LMS_SHA256_N32_H20:
+                //    if (i == 0 && fast_flag) continue; /* This parm set */
+                                        /* takes too long for fast mode */
+                                        /* (20 seconds on my test machine) */
+                //    expect_success = true; break;
+                //case LMS_SHA256_N32_H25:
+                //    if (i == 0) continue; /* This parm set takes too long */
+                                          /* even for full mode; 10 minutes */
+                                          /* for a test that doesn't tell */
+                                          /* us much */
+                //    expect_success = true; break;
+                //default:   /* All unsupported LM types */
+                //    expect_success = false; break;
+                case LMS_SM3_N32_H5:
+                case LMS_SM3_N32_H10:
+                case LMS_SM3_N32_H15:
                     expect_success = true; break;
-                case LMS_SHA256_N32_H20:
+                case LMS_SM3_N32_H20:
                     if (i == 0 && fast_flag) continue; /* This parm set */
                                         /* takes too long for fast mode */
                                         /* (20 seconds on my test machine) */
                     expect_success = true; break;
-                case LMS_SHA256_N32_H25:
+                case LMS_SM3_N32_H25:
                     if (i == 0) continue; /* This parm set takes too long */
                                           /* even for full mode; 10 minutes */
                                           /* for a test that doesn't tell */
                                           /* us much */
                     expect_success = true; break;
                 default:   /* All unsupported LM types */
-                    expect_success = false; break;
+                    expect_success = false; break;    
                 }
                 lm_type[i] = lm;
                 struct hss_extra_info info;
@@ -223,7 +245,8 @@ bool test_keygen(bool fast_flag, bool quiet_flag) {
                                 d, lm_type, ots_type,
                                 ignore_priv_key, NULL, pub_key, len_pub_key,
                                 NULL, 0, &info);
-                lm_type[i] = LMS_SHA256_N32_H5;
+                //lm_type[i] = LMS_SHA256_N32_H5;
+                lm_type[i] = LMS_SM3_N32_H5;
                 if (expect_success != got_success) {
                     printf( "Keygen with lm_type[%d] = %d: success = %d\n",
                                                         i, lm, got_success );
@@ -243,10 +266,14 @@ bool test_keygen(bool fast_flag, bool quiet_flag) {
             for (ots = 0; ots < 100; ots++) {
                 bool expect_success;
                 switch (ots) {
-                case LMOTS_SHA256_N32_W1:
-                case LMOTS_SHA256_N32_W2:
-                case LMOTS_SHA256_N32_W4:
-                case LMOTS_SHA256_N32_W8:
+                //case LMOTS_SHA256_N32_W1:
+                //case LMOTS_SHA256_N32_W2:
+                //case LMOTS_SHA256_N32_W4:
+                //case LMOTS_SHA256_N32_W8:
+                case LMOTS_SM3_N32_W1:
+                case LMOTS_SM3_N32_W2:
+                case LMOTS_SM3_N32_W4:
+                case LMOTS_SM3_N32_W8:
                     expect_success = true; break;
                 default:   /* All unsupported LM types */
                     expect_success = false; break;
@@ -258,7 +285,8 @@ bool test_keygen(bool fast_flag, bool quiet_flag) {
                               d, lm_type, ots_type,
                               ignore_priv_key, NULL, pub_key, len_pub_key,
                               NULL, 0, &info);
-                ots_type[i] = LMOTS_SHA256_N32_W2;
+                //ots_type[i] = LMOTS_SHA256_N32_W2;
+                ots_type[i] = LMOTS_SM3_N32_W2;
                 if (expect_success != got_success) {
                     printf( "Keygen with ots_type[%d] = %d: success = %d\n", i, ots, got_success );
                     return false;
@@ -343,13 +371,17 @@ bool test_keygen(bool fast_flag, bool quiet_flag) {
     /* Check out the aux data, for various parameter sets and lengths of */
     /* aux data */
     int i;
-    for (i=LMS_SHA256_N32_H5; i<=LMS_SHA256_N32_H20; i++) {
+    //for (i=LMS_SHA256_N32_H5; i<=LMS_SHA256_N32_H20; i++) {
+    for (i=LMS_SM3_N32_H5; i<=LMS_SM3_N32_H20; i++) {
         /* In fast mode, don't try the H20 parm set */
-        if (fast_flag && i == LMS_SHA256_N32_H20) continue;
+        //if (fast_flag && i == LMS_SHA256_N32_H20) continue;
+        if (fast_flag && i == LMS_SM3_N32_H20) continue;
 
         param_set_t lm_type[2];
-        lm_type[0] = i; lm_type[1] = LMS_SHA256_N32_H5;
-        param_set_t ots_type[2] = { LMOTS_SHA256_N32_W2, LMOTS_SHA256_N32_W4 };
+        //lm_type[0] = i; lm_type[1] = LMS_SHA256_N32_H5;
+        //param_set_t ots_type[2] = { LMOTS_SHA256_N32_W2, LMOTS_SHA256_N32_W4 };
+        lm_type[0] = i; lm_type[1] = LMS_SM3_N32_H5;
+        param_set_t ots_type[2] = { LMOTS_SM3_N32_W2, LMOTS_SM3_N32_W4 };
         int d = 2;
 
         int pubkey_size = hss_get_public_key_len( d, lm_type, ots_type );

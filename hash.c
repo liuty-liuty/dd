@@ -1,6 +1,7 @@
 #include <string.h>
 #include "hash.h"
 #include "sha256.h"
+#include "sm3.h"
 #include "hss_zeroize.h"
 
 #define ALLOW_VERBOSE 0  /* 1 -> we allow the dumping of intermediate */
@@ -50,6 +51,18 @@ void hss_hash_ctx(void *result, int hash_type, union hash_context *ctx,
 #endif
         break;
     }
+    case HASH_SM3: {
+        sm3_starts(&ctx->sm3);
+        sm3_update(&ctx->sm3, message, message_len);
+        sm3_finish(result, &ctx->sm3);
+#if ALLOW_VERBOSE
+        if (hss_verbose) {
+            printf( " ->" );
+            int i; for (i=0; i<32; i++) printf( " %02x", ((unsigned char *)result)[i] ); printf( "\n" );
+        }
+#endif
+        break;
+    }
     }
 }
 
@@ -71,6 +84,9 @@ void hss_init_hash_context(int h, union hash_context *ctx) {
     case HASH_SHA256:
         SHA256_Init( &ctx->sha256 );
         break;
+    case HASH_SM3:
+        sm3_starts( &ctx->sm3 );
+        break;
     }
 }
 
@@ -84,6 +100,9 @@ void hss_update_hash_context(int h, union hash_context *ctx,
     switch (h) {
     case HASH_SHA256:
         SHA256_Update(&ctx->sha256, msg, len_msg);
+        break;
+    case HASH_SM3:
+        sm3_update(&ctx->sm3, msg, len_msg);
         break;
     }
 }
@@ -100,6 +119,16 @@ void hss_finalize_hash_context(int h, union hash_context *ctx, void *buffer) {
     }
 #endif
         break;
+    case HASH_SM3:
+        sm3_finish(buffer, &ctx->sm3);
+#if ALLOW_VERBOSE
+    if (hss_verbose) {
+        printf( " -->" );
+        int i; for (i=0; i<32; i++) printf( " %02x", ((unsigned char*)buffer)[i] );
+        printf( "\n" );
+    }
+#endif
+        break;
     }
 }
 
@@ -107,14 +136,14 @@ void hss_finalize_hash_context(int h, union hash_context *ctx, void *buffer) {
 unsigned hss_hash_length(int hash_type) {
     switch (hash_type) {
     case HASH_SHA256: return 32;
-    }
+    case HASH_SM3: return 32;}
     return 0;
 }
 
 unsigned hss_hash_blocksize(int hash_type) {
     switch (hash_type) {
     case HASH_SHA256: return 64;
-    }
+    case HASH_SM3: return 64;}
     return 0;
 }
 

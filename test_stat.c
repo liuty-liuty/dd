@@ -40,9 +40,13 @@
 /*
  * This is the parameter set we use (and the internal number of hashes)
  */
-#define LM_PARAM  LMS_SHA256_N32_H5  /* Use as cheap of an LM path as */
+//#define LM_PARAM  LMS_SHA256_N32_H5  /* Use as cheap of an LM path as */
                               /* possible; this is not what we're testing */
-#define OTS_PARAM LMOTS_SHA256_N32_W1 /* Problems with the hash is */
+//#define OTS_PARAM LMOTS_SHA256_N32_W1 /* Problems with the hash is */
+                              /* more likely to show up here */
+#define LM_PARAM  LMS_SM3_N32_H5  /* Use as cheap of an LM path as */
+                              /* possible; this is not what we're testing */
+#define OTS_PARAM LMOTS_SM3_N32_W1 /* Problems with the hash is */
                               /* more likely to show up here */
 /* If you change the above params, the below need to be fixed as well */
 /* Note: hashes are actually 32 bytes; however I values are 16, and we'd */
@@ -113,10 +117,14 @@ bool test_stat(bool fast_flag, bool quiet_flag) {
         param_set_t lm_type[MAX_D], lm_ots_type[MAX_D];
         int i;
         for (i=0; i<d; i++) {
-            lm_type[i] = LMS_SHA256_N32_H5;
+            //lm_type[i] = LMS_SHA256_N32_H5;
+            lm_type[i] = LMS_SM3_N32_H5;
+
                 /* We use W=1, as that's more likely to allow hash */
                 /* failures to show up */ 
-            lm_ots_type[i] = LMOTS_SHA256_N32_W1;
+            //lm_ots_type[i] = LMOTS_SHA256_N32_W1;
+            lm_ots_type[i] = LMOTS_SM3_N32_W1;
+
         }
         size_t pub_key_len =  hss_get_public_key_len(d, lm_type, lm_ots_type);
         size_t sig_len = hss_get_signature_len(d, lm_type, lm_ots_type);

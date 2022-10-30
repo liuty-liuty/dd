@@ -13,7 +13,7 @@
 bool lm_ots_look_up_parameter_set(param_set_t parameter_set,
      unsigned *h, unsigned *n, unsigned *w, unsigned *p, unsigned *ls) {
     unsigned v_h, v_n, v_w, v_p, v_ls;
-    switch (parameter_set) {
+    switch (parameter_set) {/*
     case LMOTS_SHA256_N32_W1:
         v_h = HASH_SHA256; v_n = 32; v_w = 1; v_p = 265; v_ls = 7; break;
     case LMOTS_SHA256_N32_W2:
@@ -22,6 +22,16 @@ bool lm_ots_look_up_parameter_set(param_set_t parameter_set,
         v_h = HASH_SHA256; v_n = 32; v_w = 4; v_p = 67; v_ls = 4; break;
     case LMOTS_SHA256_N32_W8:
         v_h = HASH_SHA256; v_n = 32; v_w = 8; v_p = 34; v_ls = 0; break;
+*/
+    case LMOTS_SM3_N32_W1:
+        v_h = HASH_SM3; v_n = 32; v_w = 1; v_p = 265; v_ls = 7; break;
+    case LMOTS_SM3_N32_W2:
+        v_h = HASH_SM3; v_n = 32; v_w = 2; v_p = 133; v_ls = 6; break;
+    case LMOTS_SM3_N32_W4:
+        v_h = HASH_SM3; v_n = 32; v_w = 4; v_p = 67; v_ls = 0; break;
+    case LMOTS_SM3_N32_W8:
+        v_h = HASH_SM3; v_n = 32; v_w = 8; v_p = 34; v_ls = 0; break;
+
     default: return false;
     }
 

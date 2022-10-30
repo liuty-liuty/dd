@@ -28,8 +28,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define PARM_SET  LMS_SHA256_N32_H5
-#define PARM_SET_2 LMOTS_SHA256_N32_W2
+//#define PARM_SET  LMS_SHA256_N32_H5
+//#define PARM_SET_2 LMOTS_SHA256_N32_W2
+#define PARM_SET  LMS_SM3_N32_H5
+#define PARM_SET_2 LMOTS_SM3_N32_W2
 
 #define LEVELS 3
 

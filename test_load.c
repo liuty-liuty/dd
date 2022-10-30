@@ -24,8 +24,10 @@ static bool test_aux( param_set_t lm_setting ) {
     int levels = 2;
     param_set_t lm[2];
     lm[0] = lm_setting;
-    lm[1] = LMS_SHA256_N32_H5;
-    param_set_t ots[2] = { LMOTS_SHA256_N32_W2, LMOTS_SHA256_N32_W2 };
+    //lm[1] = LMS_SHA256_N32_H5;
+    //param_set_t ots[2] = { LMOTS_SHA256_N32_W2, LMOTS_SHA256_N32_W2 };
+    lm[1] = LMS_SM3_N32_H5;
+    param_set_t ots[2] = { LMOTS_SM3_N32_W2, LMOTS_SM3_N32_W2 };
     unsigned char priv_key[HSS_MAX_PRIVATE_KEY_LEN];
     unsigned char len_pub_key = hss_get_public_key_len(levels, lm, ots);
     if (!len_pub_key || len_pub_key > HSS_MAX_PUBLIC_KEY_LEN) return false;
@@ -142,13 +144,18 @@ bool test_load(bool fast_flag, bool quiet_flag) {
     /*
      * Make sure that various sizes of aux data work consistently
      */
-    if (!test_aux( LMS_SHA256_N32_H5 )) return false;
-    if (!test_aux( LMS_SHA256_N32_H10 )) return false;
-    if (!test_aux( LMS_SHA256_N32_H15 )) return false;
+    //if (!test_aux( LMS_SHA256_N32_H5 )) return false;
+    //if (!test_aux( LMS_SHA256_N32_H10 )) return false;
+    //if (!test_aux( LMS_SHA256_N32_H15 )) return false;
+    //if (!fast_flag) {
+    //    if (!test_aux( LMS_SHA256_N32_H20 )) return false;
+    //}
+    if (!test_aux( LMS_SM3_N32_H5 )) return false;
+    if (!test_aux( LMS_SM3_N32_H10 )) return false;
+    if (!test_aux( LMS_SM3_N32_H15 )) return false;
     if (!fast_flag) {
-        if (!test_aux( LMS_SHA256_N32_H20 )) return false;
+        if (!test_aux( LMS_SM3_N32_H20 )) return false;
     }
-
     /*
      * Verify that we can't load a private key with the wrong parameter set
      * into an already allocated working set
@@ -157,15 +164,24 @@ bool test_load(bool fast_flag, bool quiet_flag) {
     struct hss_working_key *w[NUM_PARM_SETS] = { 0 };
 
     int index = 0;
+    //if (!load_key( &index, priv_key, w, 1,
+    //               LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W2)) return false;
+    //if (!load_key( &index, priv_key, w, 1,
+    //               LMS_SHA256_N32_H10, LMOTS_SHA256_N32_W2)) return false;
+    //if (!load_key( &index, priv_key, w, 1,
+    //               LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W4)) return false;
+    //if (!load_key( &index, priv_key, w, 2,
+    //               LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W2,
+    //               LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W2)) return false;
     if (!load_key( &index, priv_key, w, 1,
-                   LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W2)) return false;
+                   LMS_SM3_N32_H5, LMOTS_SM3_N32_W2)) return false;
     if (!load_key( &index, priv_key, w, 1,
-                   LMS_SHA256_N32_H10, LMOTS_SHA256_N32_W2)) return false;
+                   LMS_SM3_N32_H10, LMOTS_SM3_N32_W2)) return false;
     if (!load_key( &index, priv_key, w, 1,
-                   LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W4)) return false;
+                   LMS_SM3_N32_H5, LMOTS_SM3_N32_W4)) return false;
     if (!load_key( &index, priv_key, w, 2,
-                   LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W2,
-                   LMS_SHA256_N32_H5, LMOTS_SHA256_N32_W2)) return false;
+                   LMS_SM3_N32_H5, LMOTS_SM3_N32_W2,
+                   LMS_SM3_N32_H5, LMOTS_SM3_N32_W2)) return false;
 
     int i, j;
     bool retval = true;

@@ -30,7 +30,8 @@
                         /* hash function mapping */
 #else
 #if SEED_LEN == 32
-#define HASH HASH_SHA256  /* We always use SHA-256 to derive seeds */
+//#define HASH HASH_SHA256  /* We always use SHA-256 to derive seeds */
+#define HASH HASH_SM3  /* We always use SM3 to derive seeds */
 #else
 #error We need to define a hash function for this seed length
 #endif

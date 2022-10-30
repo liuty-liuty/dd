@@ -58,11 +58,16 @@ static bool do_validate( void *public_key,
 #define MAX_D 4
 bool test_verify_inc(bool fast_flag, bool quiet_flag) {
     int d;
-    param_set_t lm_array[MAX_D] = { LMS_SHA256_N32_H10, LMS_SHA256_N32_H5,
-                                    LMS_SHA256_N32_H5, LMS_SHA256_N32_H5 };
+    //param_set_t lm_array[MAX_D] = { LMS_SHA256_N32_H10, LMS_SHA256_N32_H5,
+    //                                LMS_SHA256_N32_H5, LMS_SHA256_N32_H5 };
+    //param_set_t lm_ots_array[MAX_D] = {
+    //              LMOTS_SHA256_N32_W4, LMOTS_SHA256_N32_W4,
+    //              LMOTS_SHA256_N32_W4, LMOTS_SHA256_N32_W4 };
+    param_set_t lm_array[MAX_D] = { LMS_SM3_N32_H10, LMS_SM3_N32_H5,
+                                    LMS_SM3_N32_H5, LMS_SM3_N32_H5 };
     param_set_t lm_ots_array[MAX_D] = {
-                  LMOTS_SHA256_N32_W4, LMOTS_SHA256_N32_W4,
-                  LMOTS_SHA256_N32_W4, LMOTS_SHA256_N32_W4 };
+                  LMOTS_SM3_N32_W4, LMOTS_SM3_N32_W4,
+                  LMOTS_SM3_N32_W4, LMOTS_SM3_N32_W4 };
 
     for (d=1; d<=MAX_D; d++) {
     size_t len_private_key = hss_get_private_key_len(d, lm_array, lm_ots_array );

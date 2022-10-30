@@ -94,18 +94,25 @@ bool hss_generate_root_seed_I_value(unsigned char *seed, unsigned char *I,
 #endif
     union hash_context ctx;
 
-    hss_hash_ctx(hash_postimage, HASH_SHA256, &ctx, hash_preimage,
+    //hss_hash_ctx(hash_postimage, HASH_SHA256, &ctx, hash_preimage,
+    //                                                        TOPSEED_LEN );
+    hss_hash_ctx(hash_postimage, HASH_SM3, &ctx, hash_preimage,
                                                             TOPSEED_LEN );
+    
     memcpy( hash_preimage + TOPSEED_SEED, hash_postimage, SEED_LEN );
 
     /* Now compute the top level seed */
     hash_preimage[TOPSEED_WHICH] = 0x01;
-    hss_hash_ctx(seed, HASH_SHA256, &ctx, hash_preimage, TOPSEED_LEN );
+    //hss_hash_ctx(seed, HASH_SHA256, &ctx, hash_preimage, TOPSEED_LEN );
+    hss_hash_ctx(seed, HASH_SM3, &ctx, hash_preimage, TOPSEED_LEN );
 
     /* Now compute the top level I value */
     hash_preimage[TOPSEED_WHICH] = 0x02;
-    hss_hash_ctx(hash_postimage, HASH_SHA256, &ctx, hash_preimage,
+    //hss_hash_ctx(hash_postimage, HASH_SHA256, &ctx, hash_preimage,
+    //                                                        TOPSEED_LEN );
+    hss_hash_ctx(hash_postimage, HASH_SM3, &ctx, hash_preimage,
                                                             TOPSEED_LEN );
+
     memcpy( I, hash_postimage, I_LEN );
 
     hss_zeroize( hash_preimage, sizeof hash_preimage );  /* There's keying */

@@ -122,8 +122,9 @@ bool do_rand( void *output, size_t len ) {
 
         /* Ok, hash all our random samples together to generate the random */
         /* string that was asked for */
-        hss_hash( output_buffer, HASH_SHA256, &buffer, sizeof buffer );
-
+        //hss_hash( output_buffer, HASH_SHA256, &buffer, sizeof buffer );
+        hss_hash( output_buffer, HASH_SM3, &buffer, sizeof buffer );
+        
         /* Copy that hash to the output buffer */
         int this_len = 32;
         if (this_len > len) this_len = len;
@@ -328,7 +329,9 @@ static int keygen(const char *keyname, const char *parm_set) {
         aux_len = 0;
         aux = 0;
     }
-
+    //time of generating key start
+    struct timeval start,end;
+    gettimeofday(&start, NULL );
     printf( "Generating private key %s (will take a while)\n",
                                        private_key_filename );
     if (!hss_generate_private_key(
@@ -344,6 +347,11 @@ static int keygen(const char *keyname, const char *parm_set) {
             free(aux);
             return 0;
     }
+     //time of generating key finish
+    gettimeofday(&end, NULL );
+    long timeuse =1000000 * ( end.tv_sec - start.tv_sec ) + end.tv_usec - start.tv_usec;
+    printf("time=%f\n",timeuse /1000000.0);
+
     free(private_key_filename); private_key_filename = 0;
 
     size_t public_key_filename_len = strlen(keyname) + sizeof (".pub" ) + 1;
@@ -497,6 +505,10 @@ static int sign(const char *keyname, char **files) {
         free(private_key_filename);
         return 0;
     }
+    //time of signing files start
+    struct timeval start,end;
+    gettimeofday(&start, NULL );
+
     int i;
     for (i=0; files[i]; i++) {
         printf( "Signing %s\n", files[i] );
@@ -567,6 +579,12 @@ static int sign(const char *keyname, char **files) {
         printf( "    signed (%s)\n", sig_file_name );
         free(sig_file_name);
     }
+     //time of signing files finish
+
+    gettimeofday(&end, NULL );
+    long timeuse =1000000 * ( end.tv_sec - start.tv_sec ) + end.tv_usec - start.tv_usec;
+    printf("time=%f\n",timeuse /1000000.0);
+
 
     hss_free_working_key(w);
     free(aux_filename);
@@ -597,6 +615,10 @@ static int verify(const char *keyname, char **files) {
          free(public_key_filename);
          return 0;
     }
+    //time of verifing signatures start
+    struct timeval start,end;
+    gettimeofday(&start, NULL );
+
     int i;
     for (i=0; files[i]; i++) {
         printf( "Verifying %s\n", files[i] );
@@ -662,6 +684,11 @@ static int verify(const char *keyname, char **files) {
             printf( "    Signature NOT verified\n" );
         }
     }
+     //time of verifing signatures finish
+
+    gettimeofday(&end, NULL );
+    long timeuse =1000000 * ( end.tv_sec - start.tv_sec ) + end.tv_usec - start.tv_usec;
+    printf("time=%f\n",timeuse /1000000.0);
 
     free(public_key_filename);
     return 1;
@@ -787,26 +814,40 @@ static int parse_parm_set( int *levels, param_set_t *lm_array,
         int h = get_integer( &parm_set );
         param_set_t lm;
         switch (h) {
-        case 5:  lm = LMS_SHA256_N32_H5;  break;
+        /*case 5:  lm = LMS_SHA256_N32_H5;  break;
         case 10: lm = LMS_SHA256_N32_H10; break;
         case 15: lm = LMS_SHA256_N32_H15; break;
         case 20: lm = LMS_SHA256_N32_H20; break;
         case 25: lm = LMS_SHA256_N32_H25; break;
+*/
+        case 5:  lm = LMS_SM3_N32_H5;  break;
+        case 10: lm = LMS_SM3_N32_H10; break;
+        case 15: lm = LMS_SM3_N32_H15; break;
+        case 20: lm = LMS_SM3_N32_H20; break;
+        case 25: lm = LMS_SM3_N32_H25; break;
+        
         case 0: printf( "Error: expected height of Merkle tree\n" ); return 0;
         default: printf( "Error: unsupported Merkle tree height %d\n", h );
                  printf( "Supported heights = 5, 10, 15, 20, 25\n" );
                  return 0;
         }
         /* Now see if we can get the Winternitz parameter */
-        param_set_t ots = LMOTS_SHA256_N32_W8;
+        //param_set_t ots = LMOTS_SHA256_N32_W8;
+        param_set_t ots = LMOTS_SM3_N32_W8;
         if (*parm_set == '/') {
             parm_set++;
             int w = get_integer( &parm_set );
-            switch (w) {
+            switch (w) {/*
             case 1: ots = LMOTS_SHA256_N32_W1; break;
             case 2: ots = LMOTS_SHA256_N32_W2; break;
             case 4: ots = LMOTS_SHA256_N32_W4; break;
             case 8: ots = LMOTS_SHA256_N32_W8; break;
+*/
+            case 1: ots = LMOTS_SM3_N32_W1; break;
+            case 2: ots = LMOTS_SM3_N32_W2; break;
+            case 4: ots = LMOTS_SM3_N32_W4; break;
+            case 8: ots = LMOTS_SM3_N32_W8; break;
+
             case 0: printf( "Error: expected Winternitz parameter\n" ); return 0;
             default: printf( "Error: unsupported Winternitz parameter %d\n", w );
                      printf( "Supported parmaeters = 1, 2, 4, 8\n" );
@@ -837,22 +878,35 @@ static void list_parameter_set(int levels, const param_set_t *lm_array,
     printf( "Parameter set being used: there are %d levels of Merkle trees\n", levels );
     int i;
     for (i=0; i<levels; i++) {
-        printf( "Level %d: hash function = SHA-256; ", i );
+        //printf( "Level %d: hash function = SHA-256; ", i );
+        printf( "Level %d: hash function = SM3; ", i );
         int h = 0;
-        switch (lm_array[i]) {
+        switch (lm_array[i]) {/*
         case LMS_SHA256_N32_H5:  h = 5; break;
         case LMS_SHA256_N32_H10: h = 10; break;
         case LMS_SHA256_N32_H15: h = 15; break;
         case LMS_SHA256_N32_H20: h = 20; break;
         case LMS_SHA256_N32_H25: h = 25; break;
+*/
+        case LMS_SM3_N32_H5:  h = 5; break;
+        case LMS_SM3_N32_H10: h = 10; break;
+        case LMS_SM3_N32_H15: h = 15; break;
+        case LMS_SM3_N32_H20: h = 20; break;
+        case LMS_SM3_N32_H25: h = 25; break;
+
         }
         printf( "%d level Merkle tree; ", h );
         int w = 0;
-        switch (ots_array[i]) {
+        switch (ots_array[i]) {/*
         case LMOTS_SHA256_N32_W1: w = 1; break;
         case LMOTS_SHA256_N32_W2: w = 2; break;
         case LMOTS_SHA256_N32_W4: w = 4; break;
         case LMOTS_SHA256_N32_W8: w = 8; break;
+*/
+        case LMOTS_SM3_N32_W1: w = 1; break;
+        case LMOTS_SM3_N32_W2: w = 2; break;
+        case LMOTS_SM3_N32_W4: w = 4; break;
+        case LMOTS_SM3_N32_W8: w = 8; break;
         }
         printf( "Winternitz param %d\n", w );
     }

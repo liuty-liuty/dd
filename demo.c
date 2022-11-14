@@ -1,4 +1,4 @@
-/*
+/* 
  * This is a demonstration program for hss
  *
  * It is a simple file sign/verify utility: it is used as follows:
